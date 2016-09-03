@@ -9,8 +9,8 @@ import fr.lteconsulting.pomexplorer.change.ChangeSet;
 import fr.lteconsulting.pomexplorer.change.graph.GraphChange;
 import fr.lteconsulting.pomexplorer.change.graph.GraphChange.GavChange;
 import fr.lteconsulting.pomexplorer.change.graph.GraphChange.RelationChange;
-import fr.lteconsulting.pomexplorer.graph.PomGraph.PomGraphReadTransaction;
 import fr.lteconsulting.pomexplorer.graph.relation.Relation;
+import fr.lteconsulting.pomexplorer.model.graph.PomGraph.PomGraphReadTransaction;
 
 /**
  * If a gav is changed, all dependencies to it are also changed

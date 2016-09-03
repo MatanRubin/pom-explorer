@@ -7,7 +7,7 @@ import fr.lteconsulting.pomexplorer.change.ChangeProcessor;
 import fr.lteconsulting.pomexplorer.change.ChangeSet;
 import fr.lteconsulting.pomexplorer.change.graph.GraphChange;
 import fr.lteconsulting.pomexplorer.change.graph.GraphChange.GavChange;
-import fr.lteconsulting.pomexplorer.graph.PomGraph.PomGraphReadTransaction;
+import fr.lteconsulting.pomexplorer.model.graph.PomGraph.PomGraphReadTransaction;
 
 /**
  * If a project is released (ie its version changes from not released to released),

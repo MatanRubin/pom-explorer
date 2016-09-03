@@ -7,9 +7,9 @@ import java.util.Set;
 
 import fr.lteconsulting.pomexplorer.change.graph.GraphChange;
 import fr.lteconsulting.pomexplorer.change.project.ProjectChange;
-import fr.lteconsulting.pomexplorer.graph.PomGraph;
-import fr.lteconsulting.pomexplorer.graph.PomGraph.PomGraphReadTransaction;
-import fr.lteconsulting.pomexplorer.graph.ProjectRepository;
+import fr.lteconsulting.pomexplorer.model.graph.PomGraph;
+import fr.lteconsulting.pomexplorer.model.graph.ProjectRepository;
+import fr.lteconsulting.pomexplorer.model.graph.PomGraph.PomGraphReadTransaction;
 
 /**
  * Some projects can be pinned as needed to be always up to date

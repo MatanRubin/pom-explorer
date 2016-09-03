@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import fr.lteconsulting.pomexplorer.Session;
-import fr.lteconsulting.pomexplorer.graph.PomGraph.PomGraphReadTransaction;
 import fr.lteconsulting.pomexplorer.model.Gav;
+import fr.lteconsulting.pomexplorer.model.graph.PomGraph.PomGraphReadTransaction;
 
 /**
  * Commodity class to handle GAV filtering by name in commands

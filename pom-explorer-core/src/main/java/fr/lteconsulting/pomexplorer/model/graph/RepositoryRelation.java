@@ -1,4 +1,4 @@
-package fr.lteconsulting.pomexplorer.graph;
+package fr.lteconsulting.pomexplorer.model.graph;
 
 import java.util.HashSet;
 import java.util.Set;

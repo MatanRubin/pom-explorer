@@ -10,9 +10,9 @@ import java.util.Set;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import fr.lteconsulting.autothreaded.AutoThreaded;
-import fr.lteconsulting.pomexplorer.graph.PomGraph.PomGraphReadTransaction;
 import fr.lteconsulting.pomexplorer.graph.relation.Relation;
 import fr.lteconsulting.pomexplorer.model.Gav;
+import fr.lteconsulting.pomexplorer.model.graph.PomGraph.PomGraphReadTransaction;
 import fr.lteconsulting.pomexplorer.webserver.MessageFactory;
 
 @AutoThreaded

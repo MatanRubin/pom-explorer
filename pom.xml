@@ -11,6 +11,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>pom-explorer</module>
+		<module>pom-explorer-core</module>
         <module>processor</module>
     </modules>
     <developers>
