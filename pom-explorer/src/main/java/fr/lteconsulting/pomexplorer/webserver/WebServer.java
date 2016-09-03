@@ -1,6 +1,6 @@
 package fr.lteconsulting.pomexplorer.webserver;
 
-import static io.undertow.Handlers.websocket;
+import static io.undertow.servlet.Servlets.servlet;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +14,14 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.servlet.ServletException;
+
+import org.glassfish.jersey.servlet.ServletContainer;
+
 import fr.lteconsulting.pomexplorer.Client;
+import fr.lteconsulting.pomexplorer.rest.JerseyConfig;
+import fr.lteconsulting.pomexplorer.rest.TestServlet;
+import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -23,6 +30,10 @@ import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
+import io.undertow.server.handlers.resource.ResourceManager;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.AbstractReceiveListener;
 import io.undertow.websockets.core.BufferedTextMessage;
@@ -95,6 +106,7 @@ public class WebServer
 	{
 		PathHandler pathHandler = new PathHandler();
 
+		// web app static files
 		String localDirectoryName = "pomexplorer-ui";
 		File servedDirectory = new File( localDirectoryName );
 		if( servedDirectory.exists() && servedDirectory.isDirectory() )
@@ -104,30 +116,28 @@ public class WebServer
 		}
 		else
 		{
-			// web app static files
-			pathHandler.addPrefixPath( "/",
-					new ResourceHandler( new ClassPathResourceManager( getClass().getClassLoader(), "pomexplorer-ui" ) ).addWelcomeFiles( "index.html" ) );
+			ResourceManager manager = new ClassPathResourceManager( getClass().getClassLoader(), "pomexplorer-ui" );
+			pathHandler.addPrefixPath( "/", new ResourceHandler( manager ).addWelcomeFiles( "index.html" ) );
 		}
 
+		// exported data files
 		File dataDir = new File( DATA_FILE_STORE_DIR );
 		dataDir.mkdirs();
 		pathHandler.addPrefixPath( DATA_FILE_PREFIX_URL, new ResourceHandler( new PathResourceManager( dataDir.toPath(), 0 ) ) );
-		
-		// http end point
+
+		// graph query
 		pathHandler.addExactPath( "/graph", new HttpHandler()
 		{
 			@Override
 			public void handleRequest( HttpServerExchange exchange ) throws Exception
 			{
-				// executor.submit( ( ) -> {
 				String result = xWebServer.onGraphQuery( getQueryParameter( exchange, "session" ), getQueryParameter( exchange, "graphQueryId" ) );
 				exchange.getResponseSender().send( result );
-				// } );
 			}
 		} );
 
-		// web socket end point
-		pathHandler.addPrefixPath( "/ws", websocket( new WebSocketConnectionCallback()
+		// websocket communication
+		pathHandler.addPrefixPath( "/ws", Handlers.websocket( new WebSocketConnectionCallback()
 		{
 			@Override
 			public void onConnect( WebSocketHttpExchange exchange, WebSocketChannel channel )
@@ -159,7 +169,38 @@ public class WebServer
 			}
 		} ) );
 
-		Undertow server = Undertow.builder().addHttpListener( port, "0.0.0.0" ).setHandler( pathHandler ).build();
+		// JAX-RS web services
+		try
+		{
+			DeploymentInfo servletBuilder = Servlets.deployment();
+
+			servletBuilder
+					.setClassLoader( WebServer.class.getClassLoader() )
+					.setContextPath( "/api" )
+					.setDeploymentName( "api.war" )
+					.addServlets(
+							servlet( "testServlet", TestServlet.class )
+									.addMapping( "/test/*" ),
+							servlet( "jerseyServlet", ServletContainer.class )
+									.setLoadOnStartup( 1 )
+									.addInitParam( "javax.ws.rs.Application", JerseyConfig.class.getName() )
+									.addMapping( "/*" ) );
+
+			DeploymentManager manager = Servlets.defaultContainer().addDeployment( servletBuilder );
+			manager.deploy();
+			pathHandler.addPrefixPath( "/api", manager.start() );
+		}
+		catch( ServletException e )
+		{
+			e.printStackTrace();
+		}
+
+		Undertow server = Undertow
+				.builder()
+				.addHttpListener( port, "0.0.0.0" )
+				.setHandler( pathHandler )
+				.build();
+		
 		server.start();
 	}
 }

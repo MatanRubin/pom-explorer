@@ -206,7 +206,6 @@ public class AppFactory
 			}
 
 			client.sendClose( message.getTalkGuid() );
-
 		}
 
 		@Override
